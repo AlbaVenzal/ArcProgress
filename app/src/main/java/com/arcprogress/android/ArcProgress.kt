@@ -31,12 +31,6 @@ class ArcProgress @JvmOverloads constructor(context: Context, attrs: AttributeSe
             this.invalidate()
         }
 
-    var suffixTextSize: Float = 0f
-        set(suffixTextSize) {
-            field = suffixTextSize
-            this.invalidate()
-        }
-
     var bottomTextSize: Float = 0f
         set(bottomTextSize) {
             field = bottomTextSize
@@ -49,7 +43,7 @@ class ArcProgress @JvmOverloads constructor(context: Context, attrs: AttributeSe
             this.invalidate()
         }
 
-    var textSize: Float = 0f
+    var progressTextSize: Float = 0f
         set(textSize) {
             field = textSize
             this.invalidate()
@@ -61,12 +55,18 @@ class ArcProgress @JvmOverloads constructor(context: Context, attrs: AttributeSe
             this.invalidate()
         }
 
-    var progress = 0f
+    var progressText: String? = null
+        set(text) {
+            field = text
+            invalidate()
+        }
+
+    var progress = 0
         set(progress) {
-            field = java.lang.Float.valueOf(DecimalFormat("#.##").format(progress.toDouble()))
+            field = progress
 
             if (this.progress > max) {
-                field = max.toFloat()
+                field = max
             }
             invalidate()
         }
@@ -89,21 +89,9 @@ class ArcProgress @JvmOverloads constructor(context: Context, attrs: AttributeSe
             this.invalidate()
         }
 
-    var arcAngle: Float = 0.toFloat()
+    var arcAngle: Float = 0f
         set(arcAngle) {
             field = arcAngle
-            this.invalidate()
-        }
-
-    var suffixText: String? = "%"
-        set(suffixText) {
-            field = suffixText
-            this.invalidate()
-        }
-
-    var suffixTextPadding: Float = 0f
-        set(suffixTextPadding) {
-            field = suffixTextPadding
             this.invalidate()
         }
 
@@ -112,8 +100,6 @@ class ArcProgress @JvmOverloads constructor(context: Context, attrs: AttributeSe
     private val default_finished_color = Color.WHITE
     private val default_unfinished_color = Color.rgb(72, 106, 176)
     private val default_text_color = Color.rgb(66, 145, 241)
-    private val default_suffix_text_size: Float
-    private val default_suffix_padding: Float
     private val default_bottom_text_size: Float
     private val default_stroke_width: Float
     private val default_suffix_text: String
@@ -127,8 +113,6 @@ class ArcProgress @JvmOverloads constructor(context: Context, attrs: AttributeSe
         default_text_size = sp2px(resources, 18)
         min_size = dp2px(resources, 100)
         default_text_size = sp2px(resources, 40)
-        default_suffix_text_size = sp2px(resources, 15)
-        default_suffix_padding = dp2px(resources, 4)
         default_suffix_text = "%"
         default_bottom_text_size = sp2px(resources, 10)
         default_stroke_width = dp2px(resources, 4)
@@ -141,38 +125,34 @@ class ArcProgress @JvmOverloads constructor(context: Context, attrs: AttributeSe
     }
 
     protected fun initByAttributes(attributes: TypedArray) {
-        finishedStrokeColor = attributes.getColor(R.styleable.ArcProgress_arc_finished_color, default_finished_color)
+        finishedStrokeColor = attributes.getColor(R.styleable.ArcProgress_finished_color, default_finished_color)
         unfinishedStrokeColor =
-            attributes.getColor(R.styleable.ArcProgress_arc_unfinished_color, default_unfinished_color)
-        textColor = attributes.getColor(R.styleable.ArcProgress_arc_text_color, default_text_color)
-        textSize = attributes.getDimension(R.styleable.ArcProgress_arc_text_size, default_text_size)
-        arcAngle = attributes.getFloat(R.styleable.ArcProgress_arc_angle, default_arc_angle)
-        max = attributes.getInt(R.styleable.ArcProgress_arc_max, default_max)
-        progress = attributes.getFloat(R.styleable.ArcProgress_arc_progress, 0f)
-        strokeWidth = attributes.getDimension(R.styleable.ArcProgress_arc_stroke_width, default_stroke_width)
-        suffixTextSize = attributes.getDimension(R.styleable.ArcProgress_arc_suffix_text_size, default_suffix_text_size)
-        suffixText =
-            if (TextUtils.isEmpty(attributes.getString(R.styleable.ArcProgress_arc_suffix_text))) default_suffix_text else attributes.getString(
-                R.styleable.ArcProgress_arc_suffix_text
-            )
-        suffixTextPadding =
-            attributes.getDimension(R.styleable.ArcProgress_arc_suffix_text_padding, default_suffix_padding)
-        bottomTextSize = attributes.getDimension(R.styleable.ArcProgress_arc_bottom_text_size, default_bottom_text_size)
-        bottomText = attributes.getString(R.styleable.ArcProgress_arc_bottom_text)
+            attributes.getColor(R.styleable.ArcProgress_unfinished_color, default_unfinished_color)
+        textColor = attributes.getColor(R.styleable.ArcProgress_text_color, default_text_color)
+        progressTextSize = attributes.getDimension(R.styleable.ArcProgress_progress_text_size, default_text_size)
+        arcAngle = attributes.getFloat(R.styleable.ArcProgress_angle, default_arc_angle)
+        max = attributes.getInt(R.styleable.ArcProgress_max, default_max)
+        progress = attributes.getInt(R.styleable.ArcProgress_progress, 0)
+        strokeWidth = attributes.getDimension(R.styleable.ArcProgress_stroke_width, default_stroke_width)
+        bottomTextSize = attributes.getDimension(R.styleable.ArcProgress_bottom_text_size, default_bottom_text_size)
+        bottomText = attributes.getString(R.styleable.ArcProgress_bottom_text)
+        progressText = attributes.getString(R.styleable.ArcProgress_progress_text)
     }
 
-    protected fun initPainters() {
-        textPaint = TextPaint()
-        textPaint?.color = textColor
-        textPaint?.textSize = textSize
-        textPaint?.isAntiAlias = true
+    private fun initPainters() {
+        textPaint = TextPaint().apply {
+            color = textColor
+            textSize = textSize
+            isAntiAlias = true
+        }
 
-        paint = Paint()
-        paint?.color = default_unfinished_color
-        paint?.isAntiAlias = true
-        paint?.strokeWidth = strokeWidth
-        paint?.style = Paint.Style.STROKE
-        paint?.strokeCap = Paint.Cap.ROUND
+        paint = Paint().apply {
+            color = default_unfinished_color
+            isAntiAlias = true
+            strokeWidth = strokeWidth
+            style = Paint.Style.STROKE
+            strokeCap = Paint.Cap.ROUND
+        }
     }
 
     override fun invalidate() {
@@ -194,55 +174,43 @@ class ArcProgress @JvmOverloads constructor(context: Context, attrs: AttributeSe
         arcBottomHeight = radius * (1 - Math.cos(angle / 180 * Math.PI)).toFloat()
     }
 
+    private fun paintText(text: String, textPaint: Paint, canvas: Canvas, color: Int, size: Float, arcHeight: Float = 0f) {
+        textPaint.color = color
+        textPaint.textSize = size
+        val textHeight = textPaint.descent() + textPaint.ascent()
+        val textBaseline = (height - textHeight - arcHeight) / 2.0f
+        canvas.drawText(text, (width - textPaint.measureText(text)) / 2.0f, textBaseline, textPaint)
+    }
+
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         val startAngle = 270 - arcAngle / 2f
         val finishedSweepAngle = this.progress / max.toFloat() * arcAngle
         var finishedStartAngle = startAngle
-        if (this.progress == 0f) finishedStartAngle = 0.01f
-        paint!!.color = unfinishedStrokeColor
-        canvas.drawArc(rectF, startAngle, arcAngle, false, paint!!)
-        paint!!.color = finishedStrokeColor
-        canvas.drawArc(rectF, finishedStartAngle, finishedSweepAngle, false, paint!!)
-
-        val text = progress.toString()
-        if (!TextUtils.isEmpty(text)) {
-            textPaint?.let {
-                it.color = textColor
-                it.textSize = textSize
-                val textHeight = it.descent() + it.ascent()
-                val textBaseline = (height - textHeight) / 2.0f
-                canvas.drawText(text, (width - it.measureText(text)) / 2.0f, textBaseline, it)
-                it.textSize = suffixTextSize
-                val suffixHeight = it.descent() + it.ascent()
-                canvas.drawText(
-                    suffixText!!,
-                    width / 2.0f + it.measureText(text) + suffixTextPadding,
-                    textBaseline + textHeight - suffixHeight,
-                    it
-                )
-            }
+        if (this.progress == 0) finishedStartAngle = 0.01f
+        paint?.let {paint ->
+            paint.color = unfinishedStrokeColor
+            canvas.drawArc(rectF, startAngle, arcAngle, false, paint)
+            paint.color = finishedStrokeColor
+            canvas.drawArc(rectF, finishedStartAngle, finishedSweepAngle, false, paint)
         }
-
-        if (arcBottomHeight == 0f) {
-            val radius = width / 2f
-            val angle = (360 - arcAngle) / 2f
-            arcBottomHeight = radius * (1 - Math.cos(angle / 180 * Math.PI)).toFloat()
-        }
-
-        if (!TextUtils.isEmpty(bottomText)) {
-            textPaint?.let {
-                it.textSize = bottomTextSize
-                val bottomTextBaseline = height.toFloat() - arcBottomHeight - (it.descent() + it.ascent()) / 2
-                bottomText?.let {bottomText ->
-                    canvas.drawText(
-                        bottomText,
-                        (width - it.measureText(bottomText)) / 2.0f,
-                        bottomTextBaseline,
-                        it
-                    )
+        textPaint?.let { textPaint ->
+            if (!TextUtils.isEmpty(progressText)) {
+                progressText?.let { progressText ->
+                    paintText(progressText, textPaint, canvas, textColor, progressTextSize)
                 }
+            }
 
+            if (arcBottomHeight == 0f) {
+                val radius = width / 2f
+                val angle = (360 - arcAngle) / 2f
+                arcBottomHeight = radius * (1 - Math.cos(angle / 180 * Math.PI)).toFloat()
+            }
+
+            if (!TextUtils.isEmpty(bottomText)) {
+                bottomText?.let { bottomText ->
+                    paintText(bottomText, textPaint, canvas, textColor, bottomTextSize, arcBottomHeight)
+                }
             }
         }
     }
@@ -251,35 +219,31 @@ class ArcProgress @JvmOverloads constructor(context: Context, attrs: AttributeSe
         val bundle = Bundle()
         bundle.putParcelable(INSTANCE_STATE, super.onSaveInstanceState())
         bundle.putFloat(INSTANCE_STROKE_WIDTH, strokeWidth)
-        bundle.putFloat(INSTANCE_SUFFIX_TEXT_SIZE, suffixTextSize)
-        bundle.putFloat(INSTANCE_SUFFIX_TEXT_PADDING, suffixTextPadding)
         bundle.putFloat(INSTANCE_BOTTOM_TEXT_SIZE, bottomTextSize)
         bundle.putString(INSTANCE_BOTTOM_TEXT, bottomText)
-        bundle.putFloat(INSTANCE_TEXT_SIZE, textSize)
+        bundle.putString(INSTANCE_PROGRESS_TEXT, progressText)
+        bundle.putFloat(INSTANCE_PROGRESS_TEXT_SIZE, progressTextSize)
         bundle.putInt(INSTANCE_TEXT_COLOR, textColor)
-        bundle.putFloat(INSTANCE_PROGRESS, progress)
+        bundle.putInt(INSTANCE_PROGRESS, progress)
         bundle.putInt(INSTANCE_MAX, max)
         bundle.putInt(INSTANCE_FINISHED_STROKE_COLOR, finishedStrokeColor)
         bundle.putInt(INSTANCE_UNFINISHED_STROKE_COLOR, unfinishedStrokeColor)
         bundle.putFloat(INSTANCE_ARC_ANGLE, arcAngle)
-        bundle.putString(INSTANCE_SUFFIX, suffixText)
         return bundle
     }
 
     override fun onRestoreInstanceState(state: Parcelable) {
         if (state is Bundle) {
             strokeWidth = state.getFloat(INSTANCE_STROKE_WIDTH)
-            suffixTextSize = state.getFloat(INSTANCE_SUFFIX_TEXT_SIZE)
-            suffixTextPadding = state.getFloat(INSTANCE_SUFFIX_TEXT_PADDING)
             bottomTextSize = state.getFloat(INSTANCE_BOTTOM_TEXT_SIZE)
             bottomText = state.getString(INSTANCE_BOTTOM_TEXT)
-            textSize = state.getFloat(INSTANCE_TEXT_SIZE)
+            progressText = state.getString(INSTANCE_PROGRESS_TEXT)
+            progressTextSize = state.getFloat(INSTANCE_PROGRESS_TEXT_SIZE)
             textColor = state.getInt(INSTANCE_TEXT_COLOR)
             max = state.getInt(INSTANCE_MAX)
-            progress = state.getFloat(INSTANCE_PROGRESS)
+            progress = state.getInt(INSTANCE_PROGRESS)
             finishedStrokeColor = state.getInt(INSTANCE_FINISHED_STROKE_COLOR)
             unfinishedStrokeColor = state.getInt(INSTANCE_UNFINISHED_STROKE_COLOR)
-            suffixText = state.getString(INSTANCE_SUFFIX)
             initPainters()
             super.onRestoreInstanceState(state.getParcelable(INSTANCE_STATE))
             return
@@ -291,18 +255,16 @@ class ArcProgress @JvmOverloads constructor(context: Context, attrs: AttributeSe
 
         private val INSTANCE_STATE = "saved_instance"
         private val INSTANCE_STROKE_WIDTH = "stroke_width"
-        private val INSTANCE_SUFFIX_TEXT_SIZE = "suffix_text_size"
-        private val INSTANCE_SUFFIX_TEXT_PADDING = "suffix_text_padding"
         private val INSTANCE_BOTTOM_TEXT_SIZE = "bottom_text_size"
         private val INSTANCE_BOTTOM_TEXT = "bottom_text"
-        private val INSTANCE_TEXT_SIZE = "text_size"
+        private val INSTANCE_PROGRESS_TEXT = "progress_text"
+        private val INSTANCE_PROGRESS_TEXT_SIZE = "text_size"
         private val INSTANCE_TEXT_COLOR = "text_color"
         private val INSTANCE_PROGRESS = "progress"
         private val INSTANCE_MAX = "max"
         private val INSTANCE_FINISHED_STROKE_COLOR = "finished_stroke_color"
         private val INSTANCE_UNFINISHED_STROKE_COLOR = "unfinished_stroke_color"
         private val INSTANCE_ARC_ANGLE = "arc_angle"
-        private val INSTANCE_SUFFIX = "suffix"
 
         fun dp2px(resources: Resources, dp: Int): Float {
             val scale = resources.getDisplayMetrics().density
