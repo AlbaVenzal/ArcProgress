@@ -209,7 +209,7 @@ class ArcProgress @JvmOverloads constructor(context: Context, attrs: AttributeSe
                     textPaint.typeface = Typeface.DEFAULT
                     textPaint.textSize = bottomTextSize
                     val bottomTextHeight = textPaint.descent() + textPaint.ascent()
-                    val bottomTextBaseline = (height - textHeight - (bottomTextHeight * 2.5f)) / 2
+                    val bottomTextBaseline = (height - textHeight - (bottomTextHeight * 2.7f)) / 2
                     canvas.drawText(bottomText, (width - textPaint.measureText(bottomText))/2f, bottomTextBaseline, textPaint)
                 }
             }
