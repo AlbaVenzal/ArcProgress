@@ -191,22 +191,17 @@ class ArcProgress @JvmOverloads constructor(context: Context, attrs: AttributeSe
             canvas.drawArc(rectF, finishedStartAngle, finishedSweepAngle, false, paint)
         }
         textPaint?.let { textPaint ->
+            var textHeight = 0f
             if (!TextUtils.isEmpty(progressText)) {
                 progressText?.let { progressText ->
                     textPaint.typeface = progressTypeface
                     var completeText = progressText
                     suffixText?.let { completeText += it }
                     textPaint.textSize = progressTextSize
-                    val textHeight = textPaint.descent() + textPaint.ascent()
+                    textHeight = textPaint.descent() + textPaint.ascent()
                     val textBaseline = (height - textHeight) / 2f
                     canvas.drawText(completeText, (width - textPaint.measureText(completeText)) / 2.0f, textBaseline, textPaint)
                 }
-            }
-
-            if (arcBottomHeight == 0f) {
-                val radius = width / 2f
-                val angle = (360 - arcAngle) / 2f
-                arcBottomHeight = radius * (1 - Math.cos(angle / 180 * Math.PI)).toFloat()
             }
 
             if (!TextUtils.isEmpty(bottomText)) {
@@ -214,7 +209,7 @@ class ArcProgress @JvmOverloads constructor(context: Context, attrs: AttributeSe
                     textPaint.typeface = Typeface.DEFAULT
                     textPaint.textSize = bottomTextSize
                     val bottomTextHeight = textPaint.descent() + textPaint.ascent()
-                    val bottomTextBaseline = height - arcBottomHeight - bottomTextHeight / 2
+                    val bottomTextBaseline = height - textHeight - bottomTextHeight / 2
                     canvas.drawText(bottomText, (width - textPaint.measureText(bottomText))/2f, bottomTextBaseline, textPaint)
                 }
             }
