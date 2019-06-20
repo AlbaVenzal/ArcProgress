@@ -180,13 +180,6 @@ class ArcProgress @JvmOverloads constructor(context: Context, attrs: AttributeSe
         arcBottomHeight = radius * (1 - Math.cos(angle / 180 * Math.PI)).toFloat()
     }
 
-    private fun paintText(text: String, textPaint: Paint, canvas: Canvas, size: Float, arcHeight: Float = 0f) {
-        textPaint.textSize = size
-        val textHeight = textPaint.descent() + textPaint.ascent()
-        val textBaseline = (height - textHeight - arcHeight) / 2.0f
-        canvas.drawText(text, (width - textPaint.measureText(text)) / 2.0f, textBaseline, textPaint)
-    }
-
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         val startAngle = 270 - arcAngle / 2f
@@ -204,7 +197,10 @@ class ArcProgress @JvmOverloads constructor(context: Context, attrs: AttributeSe
                 progressText?.let { progressText ->
                     var completeText = progressText
                     suffixText?.let { completeText += it }
-                    paintText(completeText, textPaint, canvas, progressTextSize)
+                    textPaint.textSize = progressTextSize
+                    val textHeight = textPaint.descent() + textPaint.ascent()
+                    val textBaseline = (height - textHeight) / 2f
+                    canvas.drawText(completeText, (width - textPaint.measureText(completeText)) / 2.0f, textBaseline, textPaint)
                 }
             }
 
@@ -216,7 +212,10 @@ class ArcProgress @JvmOverloads constructor(context: Context, attrs: AttributeSe
 
             if (!TextUtils.isEmpty(bottomText)) {
                 bottomText?.let { bottomText ->
-                    paintText(bottomText, textPaint, canvas, bottomTextSize, arcBottomHeight)
+                    textPaint.textSize = bottomTextSize
+                    val bottomTextHeight = textPaint.descent() + textPaint.ascent()
+                    val bottomTextBaseline = height - arcBottomHeight - bottomTextHeight / 2
+                    canvas.drawText(bottomText, (width - textPaint.measureText(bottomText))/2f, bottomTextBaseline, textPaint)
                 }
             }
         }
