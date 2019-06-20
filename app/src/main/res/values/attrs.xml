@@ -18,5 +18,9 @@
 
         <attr name="progress_text" format="string"/>
         <attr name="progress_text_size" format="dimension"/>
+        <attr name="progress_typeface" format="enum">
+            <enum name="typeface_default" value="0" />
+            <enum name="typeface_bold" value="1" />
+        </attr>
     </declare-styleable>
 </resources>

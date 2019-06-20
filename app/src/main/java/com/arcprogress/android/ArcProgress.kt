@@ -2,18 +2,13 @@ package com.arcprogress.android
 import android.content.Context
 import android.content.res.Resources
 import android.content.res.TypedArray
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.RectF
+import android.graphics.*
 import android.os.Bundle
 import android.os.Parcelable
 import android.text.TextPaint
 import android.text.TextUtils
 import android.util.AttributeSet
 import android.view.View
-
-import java.text.DecimalFormat
 
 /**
  * Created by bruce on 11/6/14.
@@ -60,6 +55,8 @@ class ArcProgress @JvmOverloads constructor(context: Context, attrs: AttributeSe
             field = text
             invalidate()
         }
+
+    var progressTypeface: Typeface = Typeface.DEFAULT
 
     var suffixText: String? = null
         set(text) {
@@ -144,6 +141,7 @@ class ArcProgress @JvmOverloads constructor(context: Context, attrs: AttributeSe
         bottomText = attributes.getString(R.styleable.ArcProgress_bottom_text)
         progressText = attributes.getString(R.styleable.ArcProgress_progress_text)
         suffixText = attributes.getString(R.styleable.ArcProgress_suffix_text)
+        progressTypeface = intToTypeface(attributes.getInt(R.styleable.ArcProgress_progress_typeface, 0))
     }
 
     private fun initPainters() {
@@ -195,6 +193,7 @@ class ArcProgress @JvmOverloads constructor(context: Context, attrs: AttributeSe
         textPaint?.let { textPaint ->
             if (!TextUtils.isEmpty(progressText)) {
                 progressText?.let { progressText ->
+                    textPaint.typeface = progressTypeface
                     var completeText = progressText
                     suffixText?.let { completeText += it }
                     textPaint.textSize = progressTextSize
@@ -212,6 +211,7 @@ class ArcProgress @JvmOverloads constructor(context: Context, attrs: AttributeSe
 
             if (!TextUtils.isEmpty(bottomText)) {
                 bottomText?.let { bottomText ->
+                    textPaint.typeface = Typeface.DEFAULT
                     textPaint.textSize = bottomTextSize
                     val bottomTextHeight = textPaint.descent() + textPaint.ascent()
                     val bottomTextBaseline = height - arcBottomHeight - bottomTextHeight / 2
@@ -236,6 +236,7 @@ class ArcProgress @JvmOverloads constructor(context: Context, attrs: AttributeSe
         bundle.putInt(INSTANCE_UNFINISHED_STROKE_COLOR, unfinishedStrokeColor)
         bundle.putFloat(INSTANCE_ARC_ANGLE, arcAngle)
         bundle.putString(INSTANCE_SUFFIX_TEXT, suffixText)
+        bundle.putInt(INSTANCE_PROGRESS_TYPEFACE, typefaceToInt(progressTypeface))
         return bundle
     }
 
@@ -252,11 +253,26 @@ class ArcProgress @JvmOverloads constructor(context: Context, attrs: AttributeSe
             finishedStrokeColor = state.getInt(INSTANCE_FINISHED_STROKE_COLOR)
             unfinishedStrokeColor = state.getInt(INSTANCE_UNFINISHED_STROKE_COLOR)
             suffixText = state.getString(INSTANCE_SUFFIX_TEXT)
+            progressTypeface = intToTypeface(state.getInt(INSTANCE_PROGRESS_TYPEFACE))
             initPainters()
             super.onRestoreInstanceState(state.getParcelable(INSTANCE_STATE))
             return
         }
         super.onRestoreInstanceState(state)
+    }
+
+    private fun typefaceToInt(typeface: Typeface): Int {
+        return when (typeface) {
+            Typeface.DEFAULT_BOLD -> 1
+            else -> 0
+        }
+    }
+
+    private fun intToTypeface(typeface: Int): Typeface {
+        return when (typeface) {
+            1 -> Typeface.DEFAULT_BOLD
+            else -> Typeface.DEFAULT
+        }
     }
 
     companion object {
@@ -266,6 +282,7 @@ class ArcProgress @JvmOverloads constructor(context: Context, attrs: AttributeSe
         private val INSTANCE_BOTTOM_TEXT_SIZE = "bottom_text_size"
         private val INSTANCE_BOTTOM_TEXT = "bottom_text"
         private val INSTANCE_PROGRESS_TEXT = "progress_text"
+        private val INSTANCE_PROGRESS_TYPEFACE = "progress_typeface"
         private val INSTANCE_SUFFIX_TEXT = "progress_text"
         private val INSTANCE_PROGRESS_TEXT_SIZE = "text_size"
         private val INSTANCE_TEXT_COLOR = "text_color"
