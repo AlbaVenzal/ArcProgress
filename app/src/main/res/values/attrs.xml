@@ -12,8 +12,6 @@
         <attr name="text_color" format="color"/>
 
         <attr name="suffix_text" format="string"/>
-        <attr name="suffix_text_size" format="dimension"/>
-        <attr name="suffix_text_padding" format="dimension"/>
 
         <attr name="bottom_text" format="string"/>
         <attr name="bottom_text_size" format="dimension"/>

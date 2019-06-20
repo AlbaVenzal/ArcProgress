@@ -61,6 +61,12 @@ class ArcProgress @JvmOverloads constructor(context: Context, attrs: AttributeSe
             invalidate()
         }
 
+    var suffixText: String? = null
+        set(text) {
+            field = text
+            invalidate()
+        }
+
     var progress = 0
         set(progress) {
             field = progress
@@ -137,6 +143,7 @@ class ArcProgress @JvmOverloads constructor(context: Context, attrs: AttributeSe
         bottomTextSize = attributes.getDimension(R.styleable.ArcProgress_bottom_text_size, default_bottom_text_size)
         bottomText = attributes.getString(R.styleable.ArcProgress_bottom_text)
         progressText = attributes.getString(R.styleable.ArcProgress_progress_text)
+        suffixText = attributes.getString(R.styleable.ArcProgress_suffix_text)
     }
 
     private fun initPainters() {
@@ -197,7 +204,9 @@ class ArcProgress @JvmOverloads constructor(context: Context, attrs: AttributeSe
         textPaint?.let { textPaint ->
             if (!TextUtils.isEmpty(progressText)) {
                 progressText?.let { progressText ->
-                    paintText(progressText, textPaint, canvas, textColor, progressTextSize)
+                    var completeText = progressText
+                    suffixText?.let { completeText += it }
+                    paintText(completeText, textPaint, canvas, textColor, progressTextSize)
                 }
             }
 
@@ -229,6 +238,7 @@ class ArcProgress @JvmOverloads constructor(context: Context, attrs: AttributeSe
         bundle.putInt(INSTANCE_FINISHED_STROKE_COLOR, finishedStrokeColor)
         bundle.putInt(INSTANCE_UNFINISHED_STROKE_COLOR, unfinishedStrokeColor)
         bundle.putFloat(INSTANCE_ARC_ANGLE, arcAngle)
+        bundle.putString(INSTANCE_SUFFIX_TEXT, suffixText)
         return bundle
     }
 
@@ -244,6 +254,7 @@ class ArcProgress @JvmOverloads constructor(context: Context, attrs: AttributeSe
             progress = state.getInt(INSTANCE_PROGRESS)
             finishedStrokeColor = state.getInt(INSTANCE_FINISHED_STROKE_COLOR)
             unfinishedStrokeColor = state.getInt(INSTANCE_UNFINISHED_STROKE_COLOR)
+            suffixText = state.getString(INSTANCE_SUFFIX_TEXT)
             initPainters()
             super.onRestoreInstanceState(state.getParcelable(INSTANCE_STATE))
             return
@@ -258,6 +269,7 @@ class ArcProgress @JvmOverloads constructor(context: Context, attrs: AttributeSe
         private val INSTANCE_BOTTOM_TEXT_SIZE = "bottom_text_size"
         private val INSTANCE_BOTTOM_TEXT = "bottom_text"
         private val INSTANCE_PROGRESS_TEXT = "progress_text"
+        private val INSTANCE_SUFFIX_TEXT = "progress_text"
         private val INSTANCE_PROGRESS_TEXT_SIZE = "text_size"
         private val INSTANCE_TEXT_COLOR = "text_color"
         private val INSTANCE_PROGRESS = "progress"
