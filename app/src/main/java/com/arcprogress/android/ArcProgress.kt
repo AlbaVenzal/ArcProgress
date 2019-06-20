@@ -149,14 +149,13 @@ class ArcProgress @JvmOverloads constructor(context: Context, attrs: AttributeSe
     private fun initPainters() {
         textPaint = TextPaint().apply {
             color = textColor
-            textSize = textSize
             isAntiAlias = true
         }
 
         paint = Paint().apply {
             color = default_unfinished_color
             isAntiAlias = true
-            strokeWidth = strokeWidth
+            strokeWidth = this@ArcProgress.strokeWidth
             style = Paint.Style.STROKE
             strokeCap = Paint.Cap.ROUND
         }
@@ -181,8 +180,7 @@ class ArcProgress @JvmOverloads constructor(context: Context, attrs: AttributeSe
         arcBottomHeight = radius * (1 - Math.cos(angle / 180 * Math.PI)).toFloat()
     }
 
-    private fun paintText(text: String, textPaint: Paint, canvas: Canvas, color: Int, size: Float, arcHeight: Float = 0f) {
-        textPaint.color = color
+    private fun paintText(text: String, textPaint: Paint, canvas: Canvas, size: Float, arcHeight: Float = 0f) {
         textPaint.textSize = size
         val textHeight = textPaint.descent() + textPaint.ascent()
         val textBaseline = (height - textHeight - arcHeight) / 2.0f
@@ -206,7 +204,7 @@ class ArcProgress @JvmOverloads constructor(context: Context, attrs: AttributeSe
                 progressText?.let { progressText ->
                     var completeText = progressText
                     suffixText?.let { completeText += it }
-                    paintText(completeText, textPaint, canvas, textColor, progressTextSize)
+                    paintText(completeText, textPaint, canvas, progressTextSize)
                 }
             }
 
@@ -218,7 +216,7 @@ class ArcProgress @JvmOverloads constructor(context: Context, attrs: AttributeSe
 
             if (!TextUtils.isEmpty(bottomText)) {
                 bottomText?.let { bottomText ->
-                    paintText(bottomText, textPaint, canvas, textColor, bottomTextSize, arcBottomHeight)
+                    paintText(bottomText, textPaint, canvas, bottomTextSize, arcBottomHeight)
                 }
             }
         }
